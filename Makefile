@@ -1,0 +1,26 @@
+CC := clang
+CFLAGS := -Wall -Wextra -O2
+
+SRC_DIR := src
+OBJ_DIR := obj
+BIN_DIR := bin
+
+TARGET := $(BIN_DIR)/medusa
+
+SRC := $(wildcard $(SRC_DIR)/*.c)
+OBJ := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(OBJ) -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -rf $(OBJ_DIR) $(BIN_DIR)
+
+.PHONY: all clean
