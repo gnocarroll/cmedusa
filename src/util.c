@@ -1,9 +1,9 @@
 #include "util.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "constants.h"
 #include "macros.h"
 
 #if defined(M_UNIX)
@@ -28,12 +28,14 @@ void exit_print(int code, const char *msg) {
     exit(code);
 }
 
-void *alloc_stack() {
+void *alloc_stack(size_t size) {
+    void *addr = NULL;
+
 #if defined(M_UNIX)
 
-    void *addr = mmap(
+    addr = mmap(
         NULL,
-        MAX_ARENA_SIZE,
+        size,
         PROT_READ | PROT_WRITE,
         MAP_ANON,
         -1,
@@ -47,18 +49,19 @@ void *alloc_stack() {
 #elif defined(M_WINDOWS)
 
 #else
-
+    assert(false && "unsupported architecture in alloc_stack");
 #endif
 }
 
-void finalize_stack(void *addr) {
+void finalize_stack(void* ptr, size_t size) {
 #if defined(M_UNIX)
 
-    munmap((char*) addr, MAX_ARENA_SIZE);
+    munmap(ptr, size);
+    return;
 
 #elif defined(M_WINDOWS)
 
 #else
-
+    assert(false && "unsupported architecture in finalize_stack");
 #endif
 }
